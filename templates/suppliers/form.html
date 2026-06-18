@@ -1,0 +1,93 @@
+<!-- Форма поставщика -->
+{% extends "base.html" %}
+
+{% block title %}{{ form_title }}{% endblock %}
+{% block page_title %}{{ form_title }}{% endblock %}
+
+{% block content %}
+<div class="card custom-card">
+    <div class="card-header custom-card-header">
+        <h5 class="mb-0">{{ form_title }}</h5>
+    </div>
+
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+            <div class="col-12 col-md-6">
+                <label class="form-label">Название компании</label>
+                <input
+                    type="text"
+                    name="company_name"
+                    class="form-control"
+                    required
+                    value="{{ supplier.company_name if supplier else '' }}"
+                    placeholder='Например: ООО "ОфисСнаб"'
+                >
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">Контактное лицо</label>
+                <input
+                    type="text"
+                    name="contact_person"
+                    class="form-control"
+                    required
+                    value="{{ supplier.contact_person if supplier else '' }}"
+                >
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">Телефон</label>
+                <input
+                    type="text"
+                    name="phone"
+                    class="form-control"
+                    required
+                    value="{{ supplier.phone if supplier else '' }}"
+                >
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">Email</label>
+                <input
+                    type="email"
+                    name="email"
+                    class="form-control"
+                    required
+                    value="{{ supplier.email if supplier else '' }}"
+                >
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Адрес</label>
+                <input
+                    type="text"
+                    name="address"
+                    class="form-control"
+                    required
+                    value="{{ supplier.address if supplier else '' }}"
+                >
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Комментарий</label>
+                <textarea
+                    name="notes"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Дополнительная информация о поставщике"
+                >{{ supplier.notes if supplier else '' }}</textarea>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-save"></i> Сохранить
+                </button>
+
+                <a href="{{ url_for('suppliers_list') }}" class="btn btn-outline-secondary">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+<!-- Список материалов -->
+{% extends "base.html" %}
+
+{% block title %}Материалы{% endblock %}
+{% block page_title %}Материалы{% endblock %}
+
+{% block content %}
+<div class="card custom-card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-12 col-md-9">
+                <label class="form-label">Поиск</label>
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Код, название или категория"
+                    value="{{ search }}"
+                >
+            </div>
+
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn btn-danger flex-fill" type="submit">
+                    <i class="bi bi-search"></i> Найти
+                </button>
+                <a href="{{ url_for('materials_list') }}" class="btn btn-outline-secondary">
+                    Сброс
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card custom-card">
+    <div class="card-header custom-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Справочник материалов</h5>
+        {% if can('materials.manage') %}
+        <a href="{{ url_for('material_create') }}" class="btn btn-danger">
+            <i class="bi bi-plus-lg"></i> Добавить материал
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table custom-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Код</th>
+                        <th>Наименование</th>
+                        <th>Категория</th>
+                        <th>Ед.</th>
+                        <th>Мин. остаток</th>
+                        <th>Текущий остаток</th>
+                        <th>Статус</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in materials %}
+                    <tr class="{% if material.current_stock < material.min_stock %}table-warning{% endif %}">
+                        <td class="fw-semibold">{{ material.code }}</td>
+                        <td>{{ material.name }}</td>
+                        <td>{{ material.category }}</td>
+                        <td>{{ material.unit }}</td>
+                        <td>{{ material.min_stock|format_number }}</td>
+                        <td>{{ material.current_stock|format_number }}</td>
+                        <td>
+                            {% if material.current_stock <= 0 %}
+                                <span class="badge bg-danger">Нет в наличии</span>
+                            {% elif material.current_stock < material.min_stock %}
+                                <span class="badge bg-warning text-dark">Низкий остаток</span>
+                            {% else %}
+                                <span class="badge bg-success">В норме</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a
+                                href="{{ url_for('material_detail', material_id=material.id) }}"
+                                class="btn btn-sm btn-outline-primary"
+                                title="Просмотр"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            {% if can('materials.manage') %}
+                            <a
+                                href="{{ url_for('material_edit', material_id=material.id) }}"
+                                class="btn btn-sm btn-outline-secondary"
+                                title="Редактировать"
+                            >
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            <form
+                                action="{{ url_for('material_delete', material_id=material.id) }}"
+                                method="POST"
+                                class="d-inline"
+                                onsubmit="return confirm('Удалить материал {{ material.name }}?');"
+                            >
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            Материалы не найдены.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-muted small mt-3">
+            Всего записей: {{ materials|length }}
+        </div>
+    </div>
+</div>
+{% endblock %}

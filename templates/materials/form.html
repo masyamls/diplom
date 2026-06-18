@@ -1,0 +1,125 @@
+<!-- Форма материала -->
+{% extends "base.html" %}
+
+{% block title %}{{ form_title }}{% endblock %}
+{% block page_title %}{{ form_title }}{% endblock %}
+
+{% block content %}
+<div class="card custom-card">
+    <div class="card-header custom-card-header">
+        <h5 class="mb-0">{{ form_title }}</h5>
+    </div>
+
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+            <div class="col-12 col-md-4">
+                <label class="form-label">Код материала</label>
+                <input
+                    type="text"
+                    name="code"
+                    class="form-control"
+                    required
+                    value="{{ material.code if material else '' }}"
+                    placeholder="Например: MAT-016"
+                >
+            </div>
+
+            <div class="col-12 col-md-8">
+                <label class="form-label">Наименование</label>
+                <input
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    required
+                    value="{{ material.name if material else '' }}"
+                    placeholder="Введите название материала"
+                >
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">Категория</label>
+                <select name="category" class="form-select" required>
+                    {% set categories = [
+                        "Канцелярия",
+                        "Оргтехника",
+                        "Мебель",
+                        "Электротехнические материалы",
+                        "Крепеж",
+                        "Хозяйственные товары",
+                        "Прочее"
+                    ] %}
+                    {% for category in categories %}
+                    <option
+                        value="{{ category }}"
+                        {% if material and material.category == category %}selected{% endif %}
+                    >
+                        {{ category }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">Единица измерения</label>
+                <select name="unit" class="form-select" required>
+                    {% set units = ["шт.", "упак.", "м", "пар", "л", "компл."] %}
+                    {% for unit in units %}
+                    <option
+                        value="{{ unit }}"
+                        {% if material and material.unit == unit %}selected{% endif %}
+                    >
+                        {{ unit }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">Минимальный остаток</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    name="min_stock"
+                    class="form-control"
+                    required
+                    value="{{ material.min_stock if material else '' }}"
+                >
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">Текущий остаток</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    name="current_stock"
+                    class="form-control"
+                    required
+                    value="{{ material.current_stock if material else '' }}"
+                >
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Описание</label>
+                <textarea
+                    name="description"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Краткое описание материала"
+                >{{ material.description if material else '' }}</textarea>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-save"></i> Сохранить
+                </button>
+
+                <a href="{{ url_for('materials_list') }}" class="btn btn-outline-secondary">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

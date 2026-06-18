@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Отчеты{% endblock %}
+{% block page_title %}Отчеты{% endblock %}
+
+{% block content %}
+<div class="reports-page">
+<div class="card custom-card mb-4 reports-controls">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label">Дата с</label>
+                <input type="text" name="date_from" class="form-control" placeholder="&#1076;&#1076;.&#1084;&#1084;.&#1075;&#1075;&#1075;&#1075;" value="{{ date_from }}">
+            </div>
+            <div class="col-12 col-md-4">
+                <label class="form-label">Дата по</label>
+                <input type="text" name="date_to" class="form-control" placeholder="&#1076;&#1076;.&#1084;&#1084;.&#1075;&#1075;&#1075;&#1075;" value="{{ date_to }}">
+            </div>
+            <div class="col-12 col-md-4 d-flex gap-2">
+                <button class="btn btn-danger flex-fill" type="submit">
+                    <i class="bi bi-arrow-repeat"></i> Сформировать
+                </button>
+                <button class="btn btn-outline-secondary" type="button" onclick="window.print()">
+                    <i class="bi bi-printer"></i> Печать
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="stat-card report-stat">
+            <div class="stat-icon bg-danger-subtle text-danger">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-value">{{ total_spend|format_currency }} ₽</div>
+            <div class="stat-label">Общая сумма закупок</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="stat-card report-stat">
+            <div class="stat-icon bg-warning-subtle text-warning">
+                <i class="bi bi-truck"></i>
+            </div>
+            <div class="stat-value">{{ total_deliveries }}</div>
+            <div class="stat-label">Количество поставок</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="stat-card report-stat">
+            <div class="stat-icon bg-success-subtle text-success">
+                <i class="bi bi-building-check"></i>
+            </div>
+            <div class="stat-value">{{ suppliers_count }}</div>
+            <div class="stat-label">Количество поставщиков</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-xl-6">
+        <div class="card custom-card">
+            <div class="card-header custom-card-header">
+                <h5 class="mb-0">&#1052;&#1072;&#1090;&#1077;&#1088;&#1080;&#1072;&#1083;&#1099; &#1087;&#1086; &#1086;&#1073;&#1098;&#1105;&#1084;&#1091; &#1079;&#1072;&#1082;&#1091;&#1087;&#1086;&#1082;</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table custom-table reports-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Материал</th>
+                                <th>Количество</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_materials %}
+                            <tr>
+                                <td class="fw-semibold">{{ item.name }}</td>
+                                <td>{{ item.total_quantity|format_number }} {{ item.unit }}</td>
+                                <td>{{ item.total_amount|format_currency }} ₽</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">Нет данных для отчета.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <div class="card custom-card">
+            <div class="card-header custom-card-header">
+                <h5 class="mb-0">&#1055;&#1086;&#1089;&#1090;&#1072;&#1074;&#1097;&#1080;&#1082;&#1080; &#1087;&#1086; &#1086;&#1073;&#1098;&#1105;&#1084;&#1091; &#1087;&#1086;&#1089;&#1090;&#1072;&#1074;&#1086;&#1082;</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table custom-table reports-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Поставщик</th>
+                                <th>Поставок</th>
+                                <th>Количество</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for supplier in supplier_stats %}
+                            <tr>
+                                <td class="fw-semibold">{{ supplier.company_name }}</td>
+                                <td>{{ supplier.deliveries_count }}</td>
+                                <td>{{ supplier.total_quantity|format_number }}</td>
+                                <td>{{ supplier.total_amount|format_currency }} ₽</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Нет данных для отчета.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

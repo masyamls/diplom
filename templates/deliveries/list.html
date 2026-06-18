@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Поставки{% endblock %}
+{% block page_title %}Поставки{% endblock %}
+
+{% block content %}
+<div class="card custom-card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-12 col-md-6">
+                <label class="form-label">Поиск</label>
+                <input type="text" name="search" class="form-control" placeholder="Номер поставки, поставщик или материал" value="{{ search }}">
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Статус</label>
+                <select name="status" class="form-select">
+                    <option value="">Все статусы</option>
+                    {% for status in statuses %}
+                    <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn btn-danger flex-fill" type="submit">
+                    <i class="bi bi-search"></i> Найти
+                </button>
+                <a href="{{ url_for('deliveries_list') }}" class="btn btn-outline-secondary">Сброс</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card custom-card">
+    <div class="card-header custom-card-header">
+        <h5 class="mb-0">Журнал поставок</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table custom-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Номер</th>
+                        <th>Дата</th>
+                        <th>Поставщик</th>
+                        <th>Материал</th>
+                        <th>Количество</th>
+                        <th>Цена за ед.</th>
+                        <th>Сумма</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for delivery in deliveries %}
+                    <tr>
+                        <td class="fw-semibold">{{ delivery.delivery_number }}</td>
+                        <td>{{ delivery.delivery_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ delivery.supplier.company_name }}</td>
+                        <td>{{ delivery.material.name }}</td>
+                        <td>{{ delivery.quantity|format_number }} {{ delivery.material.unit }}</td>
+                        <td>{{ delivery.unit_price|format_currency }} ₽</td>
+                        <td>{{ delivery.total_price|format_currency }} ₽</td>
+                        <td>
+                            {% if delivery.status == "Доставлена" %}
+                            <span class="badge bg-success">Доставлена</span>
+                            {% elif delivery.status == "В пути" %}
+                            <span class="badge bg-warning text-dark">В пути</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Запланирована</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">Поставки не найдены.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

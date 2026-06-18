@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Склад{% endblock %}
+{% block page_title %}Склад{% endblock %}
+
+{% block content %}
+<div class="card custom-card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-12 col-md-6">
+                <label class="form-label">Поиск</label>
+                <input type="text" name="search" class="form-control" placeholder="Код, материал или категория" value="{{ search }}">
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Состояние</label>
+                <select name="stock_filter" class="form-select">
+                    <option value="">Все позиции</option>
+                    <option value="low" {% if selected_filter == 'low' %}selected{% endif %}>Ниже минимума</option>
+                    <option value="ok" {% if selected_filter == 'ok' %}selected{% endif %}>В норме</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn btn-danger flex-fill" type="submit">
+                    <i class="bi bi-search"></i> Найти
+                </button>
+                <a href="{{ url_for('stock_list') }}" class="btn btn-outline-secondary">Сброс</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card custom-card">
+    <div class="card-header custom-card-header">
+        <h5 class="mb-0">Складские остатки</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table custom-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Код</th>
+                        <th>Материал</th>
+                        <th>Категория</th>
+                        <th>Мин. остаток</th>
+                        <th>Текущий остаток</th>
+                        <th>Ед.</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in materials %}
+                    <tr class="{% if material.current_stock < material.min_stock %}table-warning{% endif %}">
+                        <td class="fw-semibold">{{ material.code }}</td>
+                        <td>{{ material.name }}</td>
+                        <td>{{ material.category }}</td>
+                        <td>{{ material.min_stock|format_number }}</td>
+                        <td>{{ material.current_stock|format_number }}</td>
+                        <td>{{ material.unit }}</td>
+                        <td>
+                            {% if material.current_stock <= 0 %}
+                            <span class="badge bg-danger">Нет в наличии</span>
+                            {% elif material.current_stock < material.min_stock %}
+                            <span class="badge bg-warning text-dark">Ниже минимума</span>
+                            {% else %}
+                            <span class="badge bg-success">В норме</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Материалы не найдены.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

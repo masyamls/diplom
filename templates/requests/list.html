@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Заявки на снабжение{% endblock %}
+{% block page_title %}Заявки на снабжение{% endblock %}
+
+{% block content %}
+<div class="card custom-card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-12 col-md-5">
+                <label class="form-label">Поиск</label>
+                <input
+                    type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Номер, материал, инициатор или подразделение"
+                    value="{{ search }}"
+                >
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label">Статус</label>
+                <select name="status" class="form-select">
+                    <option value="">Все статусы</option>
+                    {% for status in statuses %}
+                    <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>
+                        {{ status }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn btn-danger flex-fill" type="submit">
+                    <i class="bi bi-search"></i> Найти
+                </button>
+                <a href="{{ url_for('requests_list') }}" class="btn btn-outline-secondary">
+                    Сброс
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card custom-card">
+    <div class="card-header custom-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Список заявок</h5>
+        {% if can('requests.create') %}
+        <a href="{{ url_for('request_create') }}" class="btn btn-danger">
+            <i class="bi bi-plus-lg"></i> Добавить заявку
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table custom-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Номер</th>
+                        <th>Дата</th>
+                        <th>Инициатор</th>
+                        <th>Подразделение</th>
+                        <th>Материал</th>
+                        <th>Кол-во</th>
+                        <th>Приоритет</th>
+                        <th>Статус</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests_items %}
+                    <tr>
+                        <td class="fw-semibold">{{ req.request_number }}</td>
+                        <td>{{ req.created_at.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ req.initiator }}</td>
+                        <td>{{ req.department }}</td>
+                        <td>{{ req.material.name }}</td>
+<td>{{ req.quantity|int if req.quantity == req.quantity|int else req.quantity }} {{ req.material.unit }}</td>
+                        <td>
+                            {% if req.priority == "Высокий" %}
+                                <span class="badge bg-danger-subtle text-danger">Высокий</span>
+                            {% elif req.priority == "Средний" %}
+                                <span class="badge bg-warning-subtle text-warning">Средний</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary">Низкий</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge status-badge status-{{ req.status|replace(' ', '-') }}">
+                                {{ req.status }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a
+                                href="{{ url_for('request_detail', request_id=req.id) }}"
+                                class="btn btn-sm btn-outline-primary"
+                                title="Просмотр"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            {% if can('requests.edit') %}
+                            <a
+                                href="{{ url_for('request_edit', request_id=req.id) }}"
+                                class="btn btn-sm btn-outline-secondary"
+                                title="Редактировать"
+                            >
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if can('requests.delete') %}
+                            <form
+                                action="{{ url_for('request_delete', request_id=req.id) }}"
+                                method="POST"
+                                class="d-inline"
+                                onsubmit="return confirm('Удалить заявку {{ req.request_number }}?');"
+                            >
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            Заявки не найдены.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-muted small mt-3">
+            Всего записей: {{ requests_items|length }}
+        </div>
+    </div>
+</div>
+{% endblock %}

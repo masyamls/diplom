@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Карточка заявки{% endblock %}
+{% block page_title %}Карточка заявки {{ request_item.request_number }}{% endblock %}
+
+{% block content %}
+<div class="card custom-card">
+    <div class="card-header custom-card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-1">{{ request_item.request_number }}</h5>
+            <small class="text-muted">Подробная информация о заявке на снабжение</small>
+        </div>
+
+        <span class="badge status-badge status-{{ request_item.status|replace(' ', '-') }}">
+            {{ request_item.status }}
+        </span>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Дата создания</div>
+                    <div class="detail-value">{{ request_item.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Инициатор</div>
+                    <div class="detail-value">{{ request_item.initiator }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Подразделение</div>
+                    <div class="detail-value">{{ request_item.department }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Материал</div>
+                    <div class="detail-value">{{ request_item.material.name }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Количество</div>
+                    <div class="detail-value">
+    {{ request_item.quantity|int if request_item.quantity == request_item.quantity|int else request_item.quantity }}
+    {{ request_item.material.unit }}
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Приоритет</div>
+                    <div class="detail-value">{{ request_item.priority }}</div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="detail-box">
+                    <div class="detail-label">Комментарий</div>
+                    <div class="detail-value">
+                        {{ request_item.comment or "Комментарий отсутствует" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            {% if can('requests.edit') %}
+            <a href="{{ url_for('request_edit', request_id=request_item.id) }}" class="btn btn-danger">
+                <i class="bi bi-pencil"></i> Редактировать
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('requests_list') }}" class="btn btn-outline-secondary">
+                Назад к списку
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

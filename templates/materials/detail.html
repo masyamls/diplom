@@ -1,0 +1,99 @@
+<!-- Карточка материала -->
+{% extends "base.html" %}
+
+{% block title %}Карточка материала{% endblock %}
+{% block page_title %}Карточка материала{% endblock %}
+
+{% block content %}
+<div class="card custom-card">
+    <div class="card-header custom-card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-1">{{ material.name }}</h5>
+            <small class="text-muted">Информация о складской позиции и текущем остатке</small>
+        </div>
+
+        <span class="badge {% if material.current_stock <= 0 %}bg-danger{% elif material.current_stock < material.min_stock %}bg-warning text-dark{% else %}bg-success{% endif %}">
+            {% if material.current_stock <= 0 %}
+                Нет в наличии
+            {% elif material.current_stock < material.min_stock %}
+                Низкий остаток
+            {% else %}
+                В норме
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Код материала</div>
+                    <div class="detail-value">{{ material.code }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Категория</div>
+                    <div class="detail-value">{{ material.category }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Единица измерения</div>
+                    <div class="detail-value">{{ material.unit }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Текущий остаток</div>
+                    <div class="detail-value">{{ material.current_stock|format_number }} {{ material.unit }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Минимальный остаток</div>
+                    <div class="detail-value">{{ material.min_stock|format_number }} {{ material.unit }}</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="detail-box">
+                    <div class="detail-label">Дефицит</div>
+                    <div class="detail-value">
+                        {% if material.current_stock < material.min_stock %}
+                            {{ (material.min_stock - material.current_stock)|format_number }} {{ material.unit }}
+                        {% else %}
+                            Нет
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="detail-box">
+                    <div class="detail-label">Описание</div>
+                    <div class="detail-value">
+                        {{ material.description or "Описание отсутствует" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            {% if can('materials.manage') %}
+            <a href="{{ url_for('material_edit', material_id=material.id) }}" class="btn btn-danger">
+                <i class="bi bi-pencil"></i> Редактировать
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('materials_list') }}" class="btn btn-outline-secondary">
+                Назад к списку
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
